@@ -3,32 +3,30 @@ package com.assignment.employee.service;
 import com.assignment.employee.dto.CompanyResponse;
 import com.assignment.employee.dto.ProjectResponse;
 import com.assignment.employee.entity.Company;
+import com.assignment.employee.entity.Employee;
 import com.assignment.employee.entity.Project;
 import com.assignment.employee.repository.CompanyRepository;
 import com.assignment.employee.repository.CompanySpecifications;
 import com.assignment.employee.repository.EmployeeRepository;
 import com.assignment.employee.repository.ProjectRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CompanyService {
-    @Autowired
-    private CompanyRepository companyRepository;
-    
-    @Autowired
-    private EmployeeRepository employeeRepository;
-    
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final CompanyRepository companyRepository;
+    private final EmployeeRepository employeeRepository;
+    private final ProjectRepository projectRepository;
 
     public CompanyResponse getCompanyByName(String name) {
         Company company = companyRepository.findByNameWithProjectsAndEmployees(name)
@@ -45,48 +43,43 @@ public class CompanyService {
         return mapToResponse(companyWithDetails);
     }
 
-
     public void deleteCompanyWithCascade(Long companyId) {
 
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found with id: " + companyId));
-        
 
         Company companyWithDetails = companyRepository.findByNameWithProjectsAndEmployees(company.getName())
                 .orElse(company);
-        
-        
-        Set<com.assignment.employee.entity.Employee> allEmployees = new java.util.HashSet<>();
+
+        Set<Employee> allEmployees = new HashSet<>();
         for (Project project : companyWithDetails.getProjects()) {
-         
+
             projectRepository.findByIdWithEmployees(project.getId())
                     .ifPresent(p -> allEmployees.addAll(p.getEmployees()));
         }
-        
-
         for (Project project : companyWithDetails.getProjects()) {
             project.getEmployees().clear();
             projectRepository.save(project);
         }
-        
-        for (com.assignment.employee.entity.Employee employee : allEmployees) {
-            employee.getProjects().clear(); 
-            employeeRepository.delete(employee); 
+
+        for (Employee employee : allEmployees) {
+            employee.getProjects().clear();
+            employeeRepository.delete(employee);
         }
-        
+
         companyRepository.delete(companyWithDetails);
     }
 
     public void deleteCompanyWithoutCascade(Long companyId) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found with id: " + companyId));
-        
+
         Set<Project> projects = company.getProjects();
         for (Project project : projects) {
             project.setCompany(null);
         }
         company.getProjects().clear();
-        
+
         companyRepository.delete(company);
     }
 

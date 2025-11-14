@@ -1,4 +1,5 @@
 package com.assignment.employee.entity;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -13,10 +14,18 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.HashSet;
 import java.util.Set;
+
 @Entity
 @Table(name = "employees")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,81 +59,17 @@ public class Employee {
             inverseJoinColumns = @JoinColumn(name = "project_id"))
     private Set<Project> projects = new HashSet<>();
 
-
-    public Employee() {
-    }
-
+    // Custom constructors for convenience
     public Employee(String name, String email) {
         this.name = name;
         this.email = email;
+        this.projects = new HashSet<>();
     }
 
     public Employee(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone = phone;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-    public Company getCompany() {
-    return company;
-    }
-
-    public void setCompany(Company company) {
-    this.company = company;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
-    public Set<Project> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(Set<Project> projects) {
-        this.projects = projects;
+        this.projects = new HashSet<>();
     }
 }

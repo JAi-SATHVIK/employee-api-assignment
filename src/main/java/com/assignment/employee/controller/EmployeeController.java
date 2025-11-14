@@ -4,7 +4,7 @@ import com.assignment.employee.dto.*;
 import com.assignment.employee.entity.Employee;
 import com.assignment.employee.service.EmployeeService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/employees")
+@RequiredArgsConstructor
 public class EmployeeController {
-    @Autowired
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
 
     @GetMapping("/email/{email}/specifications")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmailUsingSpecifications(@PathVariable String email) {
@@ -91,28 +91,31 @@ public class EmployeeController {
         return ResponseEntity.ok(employees);
     }
 
+    // Scenario 1: Fetch Employee with Address using LAZY loading
     @GetMapping("/{id}/lazy")
     public ResponseEntity<EmployeeResponse> getEmployeeByIdLazy(@PathVariable Long id) {
         EmployeeResponse response = employeeService.getEmployeeByIdLazy(id);
         return ResponseEntity.ok(response);
     }
 
+    // Scenario 1: Fetch Employee with Address using EAGER loading
     @GetMapping("/{id}/eager")
     public ResponseEntity<EmployeeResponse> getEmployeeByIdEager(@PathVariable Long id) {
         EmployeeResponse response = employeeService.getEmployeeByIdEager(id);
         return ResponseEntity.ok(response);
     }
 
+    // Scenario 1: Fetch Employee with Address using LAZY loading by email
     @GetMapping("/email/{email}/lazy")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmailLazy(@PathVariable String email) {
         EmployeeResponse response = employeeService.getEmployeeByEmailLazy(email);
         return ResponseEntity.ok(response);
     }
 
+    // Scenario 1: Fetch Employee with Address using EAGER loading by email
     @GetMapping("/email/{email}/eager")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmailEager(@PathVariable String email) {
         EmployeeResponse response = employeeService.getEmployeeByEmailEager(email);
         return ResponseEntity.ok(response);
     }
 }
-

@@ -3,7 +3,7 @@ package com.assignment.employee.controller;
 import com.assignment.employee.entity.Employee;
 import com.assignment.employee.entity.Project;
 import com.assignment.employee.service.ProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,9 +15,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/projects")
+@RequiredArgsConstructor
 public class ProjectController {
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
     @GetMapping("/{projectId}/employees")
     public ResponseEntity<List<Employee>> getEmployeesByProjectId(@PathVariable Long projectId) {
@@ -55,6 +55,7 @@ public class ProjectController {
         return ResponseEntity.ok(projects);
     }
 
+    // Scenario 2: Delete Project - should NOT delete Employees
     @DeleteMapping("/{projectId}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
         projectService.deleteProject(projectId);

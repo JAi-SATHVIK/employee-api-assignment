@@ -3,7 +3,7 @@ package com.assignment.employee.controller;
 import com.assignment.employee.dto.CompanyResponse;
 import com.assignment.employee.entity.Company;
 import com.assignment.employee.service.CompanyService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/companies")
+@RequiredArgsConstructor
 public class CompanyController {
-    @Autowired
-    private CompanyService companyService;
+    private final CompanyService companyService;
 
     @GetMapping("/name/{name}")
     public ResponseEntity<CompanyResponse> getCompanyByName(@PathVariable String name) {

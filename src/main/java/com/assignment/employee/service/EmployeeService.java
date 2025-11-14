@@ -4,11 +4,12 @@ import com.assignment.employee.dto.CreateEmployeeRequest;
 import com.assignment.employee.dto.EmployeeResponse;
 import com.assignment.employee.dto.UpdateEmployeeRequest;
 import com.assignment.employee.dto.UpdatePhoneRequest;
+import com.assignment.employee.entity.Address;
 import com.assignment.employee.entity.Employee;
 import com.assignment.employee.repository.AddressRepository;
 import com.assignment.employee.repository.EmployeeRepository;
 import com.assignment.employee.repository.EmployeeSpecifications;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -17,23 +18,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class EmployeeService {
-    @Autowired
-    private EmployeeRepository employeeRepository;
-    @Autowired
-    private AddressRepository addressRepository;
+    private final EmployeeRepository employeeRepository;
+    private final AddressRepository addressRepository;
 
     public EmployeeResponse createEmployee(CreateEmployeeRequest request) {
         Employee employee = new Employee(request.getName(), request.getEmail(), request.getPhone());
-        
-        
+
         if (request.getAddress() != null) {
-            com.assignment.employee.entity.Address address = new com.assignment.employee.entity.Address();
+            Address address = new Address();
             address.setStreet(request.getAddress().getStreet());
             address.setCity(request.getAddress().getCity());
             address.setState(request.getAddress().getState());
             address.setPinCode(request.getAddress().getPinCode());
             employee.setAddress(address);
+
         } else if (request.getAddressId() != null) {
             addressRepository.findById(request.getAddressId()).ifPresent(employee::setAddress);
         }
@@ -80,7 +80,6 @@ public class EmployeeService {
         return mapToResponse(employee);
     }
 
-
     public EmployeeResponse updateEmployee(String email, UpdateEmployeeRequest request) {
         Employee employee = employeeRepository.findByEmailUsingHQL(email)
                 .orElseThrow(() -> new RuntimeException("Employee not found with email: " + email));
@@ -91,12 +90,11 @@ public class EmployeeService {
         if (request.getPhone() != null) {
             employee.setPhone(request.getPhone());
         }
-        
-        
+
         if (request.getAddress() != null) {
-            com.assignment.employee.entity.Address address;
+            Address address;
             if (employee.getAddress() != null) {
-              
+
                 address = employee.getAddress();
                 if (request.getAddress().getStreet() != null) {
                     address.setStreet(request.getAddress().getStreet());
@@ -111,8 +109,8 @@ public class EmployeeService {
                     address.setPinCode(request.getAddress().getPinCode());
                 }
             } else {
-                
-                address = new com.assignment.employee.entity.Address();
+
+                address = new Address();
                 address.setStreet(request.getAddress().getStreet());
                 address.setCity(request.getAddress().getCity());
                 address.setState(request.getAddress().getState());
@@ -120,14 +118,13 @@ public class EmployeeService {
                 employee.setAddress(address);
             }
         } else if (request.getAddressId() != null) {
-          
+
             addressRepository.findById(request.getAddressId())
                     .ifPresentOrElse(employee::setAddress, () -> {
                         throw new RuntimeException("Address not found with id: " + request.getAddressId());
                     });
         }
 
-        
         Employee updated = employeeRepository.save(employee);
         return mapToResponse(updated);
     }
@@ -156,17 +153,15 @@ public class EmployeeService {
         return employeeRepository.findAll(spec, pageable);
     }
 
-
     public EmployeeResponse getEmployeeByIdLazy(Long id) {
         Employee employee = employeeRepository.findByIdLazy(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
 
         if (employee.getAddress() != null) {
-            employee.getAddress().getStreet(); 
+            employee.getAddress().getStreet();
         }
         return mapToResponse(employee);
     }
-
 
     public EmployeeResponse getEmployeeByIdEager(Long id) {
         Employee employee = employeeRepository.findByIdEager(id)
@@ -174,17 +169,16 @@ public class EmployeeService {
         return mapToResponse(employee);
     }
 
-
     public EmployeeResponse getEmployeeByEmailLazy(String email) {
         Employee employee = employeeRepository.findByEmailLazy(email)
                 .orElseThrow(() -> new RuntimeException("Employee not found with email: " + email));
 
         if (employee.getAddress() != null) {
-            employee.getAddress().getStreet(); 
+            employee.getAddress().getStreet();
         }
         return mapToResponse(employee);
     }
-    
+
     public EmployeeResponse getEmployeeByEmailEager(String email) {
         Employee employee = employeeRepository.findByEmailEager(email)
                 .orElseThrow(() -> new RuntimeException("Employee not found with email: " + email));
