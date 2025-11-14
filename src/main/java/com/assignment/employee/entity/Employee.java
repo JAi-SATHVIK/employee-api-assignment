@@ -59,7 +59,6 @@ public class Employee {
             inverseJoinColumns = @JoinColumn(name = "project_id"))
     private Set<Project> projects = new HashSet<>();
 
-    // Custom constructors for convenience
     public Employee(String name, String email) {
         this.name = name;
         this.email = email;

@@ -35,19 +35,15 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
     @Query("SELECT p FROM Project p JOIN p.employees e WHERE e.email = :employeeEmail")
     java.util.List<com.assignment.employee.entity.Project> findProjectsByEmployeeEmail(@Param("employeeEmail") String employeeEmail);
 
-    // Scenario 1: Fetch Employee with Address using LAZY (default)
     @Query("SELECT e FROM Employee e WHERE e.id = :id")
     Optional<Employee> findByIdLazy(@Param("id") Long id);
 
-    // Scenario 1: Fetch Employee with Address using EAGER
     @Query("SELECT e FROM Employee e LEFT JOIN FETCH e.address WHERE e.id = :id")
     Optional<Employee> findByIdEager(@Param("id") Long id);
 
-    // Scenario 1: Fetch Employee with Address using LAZY by email
     @Query("SELECT e FROM Employee e WHERE e.email = :email")
     Optional<Employee> findByEmailLazy(@Param("email") String email);
 
-    // Scenario 1: Fetch Employee with Address using EAGER by email
     @Query("SELECT e FROM Employee e LEFT JOIN FETCH e.address WHERE e.email = :email")
     Optional<Employee> findByEmailEager(@Param("email") String email);
 }

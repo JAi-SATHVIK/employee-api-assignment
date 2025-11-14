@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateEmployeeRequest {
-    // Convenience constructor for tests
     public CreateEmployeeRequest(String name, String email, String phone) {
         this.name = name;
         this.email = email;

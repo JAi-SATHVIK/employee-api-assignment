@@ -91,28 +91,24 @@ public class EmployeeController {
         return ResponseEntity.ok(employees);
     }
 
-    // Scenario 1: Fetch Employee with Address using LAZY loading
     @GetMapping("/{id}/lazy")
     public ResponseEntity<EmployeeResponse> getEmployeeByIdLazy(@PathVariable Long id) {
         EmployeeResponse response = employeeService.getEmployeeByIdLazy(id);
         return ResponseEntity.ok(response);
     }
 
-    // Scenario 1: Fetch Employee with Address using EAGER loading
     @GetMapping("/{id}/eager")
     public ResponseEntity<EmployeeResponse> getEmployeeByIdEager(@PathVariable Long id) {
         EmployeeResponse response = employeeService.getEmployeeByIdEager(id);
         return ResponseEntity.ok(response);
     }
 
-    // Scenario 1: Fetch Employee with Address using LAZY loading by email
     @GetMapping("/email/{email}/lazy")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmailLazy(@PathVariable String email) {
         EmployeeResponse response = employeeService.getEmployeeByEmailLazy(email);
         return ResponseEntity.ok(response);
     }
 
-    // Scenario 1: Fetch Employee with Address using EAGER loading by email
     @GetMapping("/email/{email}/eager")
     public ResponseEntity<EmployeeResponse> getEmployeeByEmailEager(@PathVariable String email) {
         EmployeeResponse response = employeeService.getEmployeeByEmailEager(email);

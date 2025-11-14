@@ -55,7 +55,6 @@ public class ProjectController {
         return ResponseEntity.ok(projects);
     }
 
-    // Scenario 2: Delete Project - should NOT delete Employees
     @DeleteMapping("/{projectId}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
         projectService.deleteProject(projectId);
