@@ -1,9 +1,20 @@
 package com.assignment.employee.entity;
-
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import java.util.HashSet;
+import java.util.Set;
 @Entity
 @Table(name = "employees")
 public class Employee {
@@ -26,8 +37,19 @@ public class Employee {
     @Column
     private String phone;
 
-    @Column
-    private String address;
+    @ManyToOne
+    private Company company;
+
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, fetch = jakarta.persistence.FetchType.LAZY)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private Address address;
+
+    @ManyToMany(fetch = jakarta.persistence.FetchType.LAZY)
+    @JoinTable(name = "employee_projects",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id"))
+    private Set<Project> projects = new HashSet<>();
+
 
     public Employee() {
     }
@@ -82,13 +104,27 @@ public class Employee {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+    public Company getCompany() {
+    return company;
+    }
 
-    public String getAddress() {
+    public void setCompany(Company company) {
+    this.company = company;
+    }
+
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
-}
 
+    public Set<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<Project> projects) {
+        this.projects = projects;
+    }
+}

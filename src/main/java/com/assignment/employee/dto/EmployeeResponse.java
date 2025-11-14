@@ -1,12 +1,14 @@
 package com.assignment.employee.dto;
 
+import com.assignment.employee.entity.Address;
+
 public class EmployeeResponse {
     private Long id;
     private String name;
     private String lastName;
     private String email;
     private String phone;
-    private String address;
+    private Address address;
 
     public EmployeeResponse() {
     }
@@ -51,12 +53,11 @@ public class EmployeeResponse {
         this.phone = phone;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 }
-

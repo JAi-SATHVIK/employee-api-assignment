@@ -7,11 +7,31 @@ public class CreateEmployeeRequest {
     @NotBlank(message = "Name is required")
     private String name;
 
+    private Long addressId;
+    
+    private AddressRequest address;
+
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
 
     private String phone;
+    
+    public static class AddressRequest {
+        private String street;
+        private String city;
+        private String state;
+        private String pinCode;
+        
+        public String getStreet() { return street; }
+        public void setStreet(String street) { this.street = street; }
+        public String getCity() { return city; }
+        public void setCity(String city) { this.city = city; }
+        public String getState() { return state; }
+        public void setState(String state) { this.state = state; }
+        public String getPinCode() { return pinCode; }
+        public void setPinCode(String pinCode) { this.pinCode = pinCode; }
+    }
 
     public CreateEmployeeRequest() {
     }
@@ -50,5 +70,20 @@ public class CreateEmployeeRequest {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-}
 
+    public Long getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(Long addressId) {
+        this.addressId = addressId;
+    }
+    
+    public AddressRequest getAddress() {
+        return address;
+    }
+    
+    public void setAddress(AddressRequest address) {
+        this.address = address;
+    }
+}

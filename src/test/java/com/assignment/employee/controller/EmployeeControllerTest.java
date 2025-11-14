@@ -1,10 +1,12 @@
 package com.assignment.employee.controller;
 
+import com.assignment.employee.entity.Address;
 import com.assignment.employee.dto.*;
 import com.assignment.employee.service.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -16,6 +18,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(EmployeeController.class)
 class EmployeeControllerTest {
     @Autowired
@@ -134,15 +137,18 @@ class EmployeeControllerTest {
         UpdateEmployeeRequest request = new UpdateEmployeeRequest();
         request.setLastName("Smith");
         request.setPhone("9876543210");
-        request.setAddress("456 Oak Ave");
+        request.setAddressId(1L);
+
+        Address address = new Address();
+        address.setId(1L);
+        address.setStreet("456 Oak Ave");
 
         EmployeeResponse response = new EmployeeResponse();
         response.setId(1L);
         response.setName("Aarav Sharma");
         response.setLastName("Smith");
         response.setPhone("9876543210");
-        response.setAddress("456 Oak Ave");
-
+        response.setAddress(address);
         when(employeeService.updateEmployee(eq("aarav.sharma@example.com"), any(UpdateEmployeeRequest.class))).thenReturn(response);
 
         mockMvc.perform(put("/api/employees/aarav.sharma@example.com")
@@ -175,4 +181,3 @@ class EmployeeControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
-

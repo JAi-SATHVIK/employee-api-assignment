@@ -5,9 +5,12 @@ import com.assignment.employee.dto.EmployeeResponse;
 import com.assignment.employee.dto.UpdateEmployeeRequest;
 import com.assignment.employee.dto.UpdatePhoneRequest;
 import com.assignment.employee.entity.Employee;
+import com.assignment.employee.repository.AddressRepository;
 import com.assignment.employee.repository.EmployeeRepository;
 import com.assignment.employee.repository.EmployeeSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +20,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
+    @Autowired
+    private AddressRepository addressRepository;
 
     public EmployeeResponse createEmployee(CreateEmployeeRequest request) {
         Employee employee = new Employee(request.getName(), request.getEmail(), request.getPhone());
+        
+        
+        if (request.getAddress() != null) {
+            com.assignment.employee.entity.Address address = new com.assignment.employee.entity.Address();
+            address.setStreet(request.getAddress().getStreet());
+            address.setCity(request.getAddress().getCity());
+            address.setState(request.getAddress().getState());
+            address.setPinCode(request.getAddress().getPinCode());
+            employee.setAddress(address);
+        } else if (request.getAddressId() != null) {
+            addressRepository.findById(request.getAddressId()).ifPresent(employee::setAddress);
+        }
+
         Employee saved = employeeRepository.save(employee);
         return mapToResponse(saved);
     }
@@ -62,6 +80,7 @@ public class EmployeeService {
         return mapToResponse(employee);
     }
 
+
     public EmployeeResponse updateEmployee(String email, UpdateEmployeeRequest request) {
         Employee employee = employeeRepository.findByEmailUsingHQL(email)
                 .orElseThrow(() -> new RuntimeException("Employee not found with email: " + email));
@@ -72,10 +91,43 @@ public class EmployeeService {
         if (request.getPhone() != null) {
             employee.setPhone(request.getPhone());
         }
+        
+        
         if (request.getAddress() != null) {
-            employee.setAddress(request.getAddress());
+            com.assignment.employee.entity.Address address;
+            if (employee.getAddress() != null) {
+              
+                address = employee.getAddress();
+                if (request.getAddress().getStreet() != null) {
+                    address.setStreet(request.getAddress().getStreet());
+                }
+                if (request.getAddress().getCity() != null) {
+                    address.setCity(request.getAddress().getCity());
+                }
+                if (request.getAddress().getState() != null) {
+                    address.setState(request.getAddress().getState());
+                }
+                if (request.getAddress().getPinCode() != null) {
+                    address.setPinCode(request.getAddress().getPinCode());
+                }
+            } else {
+                
+                address = new com.assignment.employee.entity.Address();
+                address.setStreet(request.getAddress().getStreet());
+                address.setCity(request.getAddress().getCity());
+                address.setState(request.getAddress().getState());
+                address.setPinCode(request.getAddress().getPinCode());
+                employee.setAddress(address);
+            }
+        } else if (request.getAddressId() != null) {
+          
+            addressRepository.findById(request.getAddressId())
+                    .ifPresentOrElse(employee::setAddress, () -> {
+                        throw new RuntimeException("Address not found with id: " + request.getAddressId());
+                    });
         }
 
+        
         Employee updated = employeeRepository.save(employee);
         return mapToResponse(updated);
     }
@@ -96,6 +148,49 @@ public class EmployeeService {
         employeeRepository.delete(employee);
     }
 
+    public Page<Employee> getAllEmployees(Pageable pageable) {
+        return employeeRepository.findAll(pageable);
+    }
+
+    public Page<Employee> getAllEmployeesWithSpecification(Specification<Employee> spec, Pageable pageable) {
+        return employeeRepository.findAll(spec, pageable);
+    }
+
+
+    public EmployeeResponse getEmployeeByIdLazy(Long id) {
+        Employee employee = employeeRepository.findByIdLazy(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+
+        if (employee.getAddress() != null) {
+            employee.getAddress().getStreet(); 
+        }
+        return mapToResponse(employee);
+    }
+
+
+    public EmployeeResponse getEmployeeByIdEager(Long id) {
+        Employee employee = employeeRepository.findByIdEager(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+        return mapToResponse(employee);
+    }
+
+
+    public EmployeeResponse getEmployeeByEmailLazy(String email) {
+        Employee employee = employeeRepository.findByEmailLazy(email)
+                .orElseThrow(() -> new RuntimeException("Employee not found with email: " + email));
+
+        if (employee.getAddress() != null) {
+            employee.getAddress().getStreet(); 
+        }
+        return mapToResponse(employee);
+    }
+    
+    public EmployeeResponse getEmployeeByEmailEager(String email) {
+        Employee employee = employeeRepository.findByEmailEager(email)
+                .orElseThrow(() -> new RuntimeException("Employee not found with email: " + email));
+        return mapToResponse(employee);
+    }
+
     private EmployeeResponse mapToResponse(Employee employee) {
         EmployeeResponse response = new EmployeeResponse();
         response.setId(employee.getId());
@@ -107,4 +202,3 @@ public class EmployeeService {
         return response;
     }
 }
-

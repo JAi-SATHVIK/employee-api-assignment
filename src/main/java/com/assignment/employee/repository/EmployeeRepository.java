@@ -22,5 +22,33 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 
     @Query(value = "SELECT * FROM employees WHERE name = :name", nativeQuery = true)
     Optional<Employee> findByNameUsingNativeSQL(@Param("name") String name);
+
+    @Query("SELECT e FROM Employee e JOIN e.projects p WHERE p.id = :projectId")
+    java.util.List<Employee> findEmployeesByProjectId(@Param("projectId") Long projectId);
+
+    @Query("SELECT e FROM Employee e JOIN e.projects p WHERE p.name = :projectName")
+    java.util.List<Employee> findEmployeesByProjectName(@Param("projectName") String projectName);
+
+    @Query("SELECT p FROM Project p JOIN p.employees e WHERE e.id = :employeeId")
+    java.util.List<com.assignment.employee.entity.Project> findProjectsByEmployeeId(@Param("employeeId") Long employeeId);
+
+    @Query("SELECT p FROM Project p JOIN p.employees e WHERE e.email = :employeeEmail")
+    java.util.List<com.assignment.employee.entity.Project> findProjectsByEmployeeEmail(@Param("employeeEmail") String employeeEmail);
+
+    // Scenario 1: Fetch Employee with Address using LAZY (default)
+    @Query("SELECT e FROM Employee e WHERE e.id = :id")
+    Optional<Employee> findByIdLazy(@Param("id") Long id);
+
+    // Scenario 1: Fetch Employee with Address using EAGER
+    @Query("SELECT e FROM Employee e LEFT JOIN FETCH e.address WHERE e.id = :id")
+    Optional<Employee> findByIdEager(@Param("id") Long id);
+
+    // Scenario 1: Fetch Employee with Address using LAZY by email
+    @Query("SELECT e FROM Employee e WHERE e.email = :email")
+    Optional<Employee> findByEmailLazy(@Param("email") String email);
+
+    // Scenario 1: Fetch Employee with Address using EAGER by email
+    @Query("SELECT e FROM Employee e LEFT JOIN FETCH e.address WHERE e.email = :email")
+    Optional<Employee> findByEmailEager(@Param("email") String email);
 }
 

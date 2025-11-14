@@ -1,9 +1,14 @@
 package com.assignment.employee.controller;
 
 import com.assignment.employee.dto.*;
+import com.assignment.employee.entity.Employee;
 import com.assignment.employee.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -72,6 +77,42 @@ public class EmployeeController {
     public ResponseEntity<Void> deleteEmployeeByEmail(@PathVariable String email) {
         employeeService.deleteEmployeeByEmail(email);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<Employee>> getAllEmployees(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("DESC") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Employee> employees = employeeService.getAllEmployees(pageable);
+        return ResponseEntity.ok(employees);
+    }
+
+    @GetMapping("/{id}/lazy")
+    public ResponseEntity<EmployeeResponse> getEmployeeByIdLazy(@PathVariable Long id) {
+        EmployeeResponse response = employeeService.getEmployeeByIdLazy(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/eager")
+    public ResponseEntity<EmployeeResponse> getEmployeeByIdEager(@PathVariable Long id) {
+        EmployeeResponse response = employeeService.getEmployeeByIdEager(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/email/{email}/lazy")
+    public ResponseEntity<EmployeeResponse> getEmployeeByEmailLazy(@PathVariable String email) {
+        EmployeeResponse response = employeeService.getEmployeeByEmailLazy(email);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/email/{email}/eager")
+    public ResponseEntity<EmployeeResponse> getEmployeeByEmailEager(@PathVariable String email) {
+        EmployeeResponse response = employeeService.getEmployeeByEmailEager(email);
+        return ResponseEntity.ok(response);
     }
 }
 

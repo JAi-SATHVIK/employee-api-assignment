@@ -5,7 +5,9 @@ import com.assignment.employee.dto.EmployeeResponse;
 import com.assignment.employee.dto.UpdateEmployeeRequest;
 import com.assignment.employee.dto.UpdatePhoneRequest;
 import com.assignment.employee.entity.Employee;
+import com.assignment.employee.entity.Address;
 import com.assignment.employee.repository.EmployeeRepository;
+import com.assignment.employee.repository.AddressRepository;
 import com.assignment.employee.repository.EmployeeSpecifications;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,19 +27,26 @@ import static org.mockito.Mockito.*;
 class EmployeeServiceTest {
     @Mock
     private EmployeeRepository employeeRepository;
+    @Mock
+    private AddressRepository addressRepository;
 
     @InjectMocks
     private EmployeeService employeeService;
 
     private Employee employee;
     private CreateEmployeeRequest createRequest;
+    private Address address;
 
     @BeforeEach
     void setUp() {
+        address = new Address();
+        address.setId(1L);
+        address.setStreet("DLF Phase 3");
+        address.setCity("Gurugram");
         employee = new Employee("Aarav Sharma", "aarav.sharma@example.com", "9876543210");
         employee.setId(1L);
         employee.setLastName("Sharma");
-        employee.setAddress("DLF Phase 3, Gurugram");
+        employee.setAddress(address);
 
         createRequest = new CreateEmployeeRequest("Aarav Sharma", "aarav.sharma@example.com", "9876543210");
     }
@@ -140,9 +149,10 @@ class EmployeeServiceTest {
         UpdateEmployeeRequest updateRequest = new UpdateEmployeeRequest();
         updateRequest.setLastName("Smith");
         updateRequest.setPhone("9876543210");
-        updateRequest.setAddress("456 Oak Ave");
+        updateRequest.setAddressId(1L);
 
         when(employeeRepository.findByEmailUsingHQL("aarav.sharma@example.com")).thenReturn(Optional.of(employee));
+        when(addressRepository.findById(1L)).thenReturn(Optional.of(address));
         when(employeeRepository.save(any(Employee.class))).thenReturn(employee);
 
         EmployeeResponse response = employeeService.updateEmployee("aarav.sharma@example.com", updateRequest);
@@ -186,4 +196,3 @@ class EmployeeServiceTest {
         });
     }
 }
-

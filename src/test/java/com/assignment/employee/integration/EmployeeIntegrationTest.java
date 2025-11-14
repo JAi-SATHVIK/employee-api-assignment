@@ -4,6 +4,7 @@ import com.assignment.employee.dto.CreateEmployeeRequest;
 import com.assignment.employee.dto.EmployeeResponse;
 import com.assignment.employee.dto.UpdateEmployeeRequest;
 import com.assignment.employee.dto.UpdatePhoneRequest;
+import com.assignment.employee.entity.Address;
 import com.assignment.employee.entity.Employee;
 import com.assignment.employee.repository.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.assignment.employee.repository.AddressRepository;
+    
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -32,6 +34,9 @@ class EmployeeIntegrationTest {
     private EmployeeRepository employeeRepository;
 
     @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private Employee testEmployee;
@@ -39,9 +44,12 @@ class EmployeeIntegrationTest {
     @BeforeEach
     void setUp() {
         employeeRepository.deleteAll();
+        Address address = new Address();
+        address.setStreet("DLF Phase 3, Gurugram");
+        addressRepository.save(address);
         testEmployee = new Employee("Aarav Sharma", "aarav.sharma@example.com", "9876543210");
         testEmployee.setLastName("Sharma");
-        testEmployee.setAddress("DLF Phase 3, Gurugram");
+        testEmployee.setAddress(address);
         employeeRepository.save(testEmployee);
     }
 
@@ -119,7 +127,7 @@ class EmployeeIntegrationTest {
         UpdateEmployeeRequest request = new UpdateEmployeeRequest();
         request.setLastName("Smith");
         request.setPhone("9998887777");
-        request.setAddress("456 Oak Ave");
+        request.setAddressId(1L);
 
         mockMvc.perform(put("/api/employees/aarav.sharma@example.com")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -127,7 +135,7 @@ class EmployeeIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.lastName").value("Smith"))
                 .andExpect(jsonPath("$.phone").value("9998887777"))
-                .andExpect(jsonPath("$.address").value("456 Oak Ave"));
+                .andExpect(jsonPath("$.address.street").value("DLF Phase 3, Gurugram"));
     }
 
     @Test
@@ -170,5 +178,5 @@ class EmployeeIntegrationTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Validation Failed"));
     }
-}
 
+}
